@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="app_title">ODK SMS</string>
+
     <string name="no_message_body">No message body specified!</string>
 
     <string name="no_phone_number">No phone number specified!</string>

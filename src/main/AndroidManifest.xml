@@ -9,7 +9,8 @@
 
     <uses-permission android:name="android.permission.SEND_SMS"/>
 
-    <application>
+    <application
+            android:label="@string/app_title">
 
         <activity android:name=".smsbridge.activity.WelcomeActivity" android:screenOrientation="portrait">
             <intent-filter>
