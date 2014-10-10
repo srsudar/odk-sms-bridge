@@ -19,8 +19,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".smsbridge.activity.SMSDispatcherActivity">
-
+        <activity
+                android:name=".smsbridge.activity.SMSDispatcherActivity"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="org.opendatakit.smsbridge.activity.SMSDispatcherActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
     </application>
