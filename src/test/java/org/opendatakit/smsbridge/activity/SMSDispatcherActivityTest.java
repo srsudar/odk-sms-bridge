@@ -6,12 +6,15 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import org.fest.assertions.api.android.widget.ToastAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opendatakit.R;
 import org.opendatakit.smsbridge.util.TestUtil;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowToast;
 import org.robolectric.util.ActivityController;
 
 import java.util.ArrayList;
@@ -139,6 +142,40 @@ public class SMSDispatcherActivityTest {
     SMSDispatcherActivity activity = this.activityController.create().get();
 
     assertThat(activity.noPhoneNumbersSpecified()).isFalse();
+  }
+
+  @Test
+  public void assertValidStateFinishesAndToastsIfNoMessageBodySpecified() {
+
+    this.initializeWithMessage("");
+
+    SMSDispatcherActivity activity = this.activityController
+        .create()
+        .start()
+        .get();
+
+    assertThat(activity).isFinishing();
+
+    assertThat(ShadowToast.getTextOfLatestToast()).isEqualTo(
+        Robolectric.application.getString(R.string.no_message_body));
+
+  }
+
+  @Test
+  public void assertValidStateFinishesAndToastsIfNoPhoneNumberSpecified() {
+
+    this.initializeWithPhoneNumber(null);
+
+    SMSDispatcherActivity activity = this.activityController
+        .create()
+        .start()
+        .get();
+
+    assertThat(activity).isFinishing();
+
+    assertThat(ShadowToast.getTextOfLatestToast()).isEqualTo(
+        Robolectric.application.getString(R.string.no_phone_number));
+
   }
 
   /**
