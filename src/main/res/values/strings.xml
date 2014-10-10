@@ -5,4 +5,19 @@
 
     <string name="no_phone_number">No phone number specified!</string>
 
+    <string name="welcome_title">ODK SMS Bridge</string>
+
+    <string name="welcome_message">The ODK SMS Bridge is designed to
+    be called by other apps to send SMS messages. This screen will allow you to
+    test expected behavior of calling from other apps.</string>
+
+    <string name="phone_number_label">Phone Number</string>
+    <string name="phone_number_hint">10 Digit Number</string>
+
+    <string name="message_body_label">Message Body</string>
+    <string name="message_body_hint">Enter message body</string>
+
+    <string name="send_with_confirmation">Send with Confirmation</string>
+    <string name="send_without_confirmation">Send without Confirmation</string>
+
 </resources>
