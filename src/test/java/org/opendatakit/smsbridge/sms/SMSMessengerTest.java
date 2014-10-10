@@ -2,6 +2,10 @@ package org.opendatakit.smsbridge.sms;
 
 import static org.fest.assertions.api.ANDROID.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -58,6 +62,9 @@ public class SMSMessengerTest {
     // Don't leak state
     this.messageBody = null;
     this.targetNumbers = null;
+
+    this.messenger = null;
+
   }
 
   @Test
@@ -82,7 +89,22 @@ public class SMSMessengerTest {
 
     assertThat(messageBodyInBundle).isEqualTo(this.messageBody);
 
+  }
 
+  @Test
+  public void sendSMSViaIntentCallsCorrectHelper() {
+    this.messenger = spy(this.messenger);
+
+    doNothing()
+        .when(this.messenger)
+        .sendSingleMessageViaIntentHelper(this.activity, this.messageBody);
+
+    this.messenger.sendSMSViaIntent(this.activity);
+
+    verify(this.messenger, times(1))
+        .sendSingleMessageViaIntentHelper(
+            this.activity,
+            this.targetNumbers.get(0));
 
   }
 

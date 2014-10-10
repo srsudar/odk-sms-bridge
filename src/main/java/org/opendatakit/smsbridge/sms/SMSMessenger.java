@@ -45,8 +45,11 @@ public class SMSMessenger {
           "[sendSMSViaIntent] sending to multiple numbers is unimplemented");
     }
 
-
-
+    // For now, don't handle the multiple number case. We might have to
+    // take it off the UI thread.
+    this.sendSingleMessageViaIntentHelper(
+        launchingActivity,
+        this.mTargetNumbers.get(0));
 
   }
 
