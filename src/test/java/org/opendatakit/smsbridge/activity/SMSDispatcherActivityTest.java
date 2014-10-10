@@ -14,6 +14,9 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.util.ActivityController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author sudar.sam@gmail.com
  */
@@ -47,13 +50,121 @@ public class SMSDispatcherActivityTest {
   }
 
   @Test
-  public void intializesCorrectly() {
+  public void initializesNonNull() {
 
     this.initializeWithValidParameters();
 
     Activity activity = this.activityController.create().get();
 
     assertThat(activity).isNotNull();
+
+  }
+
+  @Test
+  public void reclaimsValuesFromIntent() {
+
+    boolean requireConfirmation = true;
+    boolean deleteMessage = true;
+    String msgBody = "this is a message body";
+    String phoneNumber = "first number";
+    String[] phoneNumbers = new String[] { "numberOne", "numberTwo"};
+
+    this.initializeWithParamters(
+        requireConfirmation,
+        deleteMessage,
+        msgBody,
+        phoneNumber,
+        phoneNumbers);
+
+    SMSDispatcherActivity activity = this.activityController.create().get();
+
+    assertThat(activity.mRequireConfirmation).isEqualTo(requireConfirmation);
+    assertThat(activity.mDeleteAfterSending).isEqualTo(deleteMessage);
+    assertThat(activity.mMessageBody).isEqualTo(msgBody);
+    assertThat(activity.mPhoneNumber).isEqualTo(phoneNumber);
+    assertThat(activity.mPhoneNumbers).isEqualTo(phoneNumbers);
+
+    List<String> reclaimedNumbers = new ArrayList<String>();
+    reclaimedNumbers.add(phoneNumber);
+    for (String number : phoneNumbers) {
+      reclaimedNumbers.add(number);
+    }
+
+    assertThat(activity.mTargetNumbers)
+        .hasSameSizeAs(reclaimedNumbers)
+        .containsAll(reclaimedNumbers);
+
+  }
+
+  @Test
+  public void noMessageBodySpecifiedNullTrue() {
+    this.initializeWithMessage(null);
+
+    SMSDispatcherActivity activity = this.activityController.create().get();
+
+    assertThat(activity.noMessageBodySpecified()).isTrue();
+  }
+
+  @Test
+  public void noMessageBodySpecifiedEmptyTrue() {
+    this.initializeWithMessage("");
+
+    SMSDispatcherActivity activity = this.activityController.create().get();
+
+    assertThat(activity.noMessageBodySpecified()).isTrue();
+  }
+
+  @Test
+  public void noMessageBodySpecifiedValidFalse() {
+    this.initializeWithMessage("this is a body");
+
+    SMSDispatcherActivity activity = this.activityController.create().get();
+
+    assertThat(activity.noMessageBodySpecified()).isFalse();
+  }
+
+  @Test
+  public void noNumbersSaysNoSpecified() {
+    this.initializeWithPhoneNumber(null);
+
+    SMSDispatcherActivity activity = this.activityController.create().get();
+
+    assertThat(activity.noPhoneNumbersSpecified()).isTrue();
+  }
+
+  @Test
+  public void numbersSpecifiedCorrect() {
+    this.initializeWithPhoneNumber("phone_number");
+
+    SMSDispatcherActivity activity = this.activityController.create().get();
+
+    assertThat(activity.noPhoneNumbersSpecified()).isFalse();
+  }
+
+  /**
+   * Set up the activity controller with all valid parameters and the given
+   * message.
+   * @param message
+   */
+  protected void initializeWithMessage(String message) {
+
+    this.initializeWithParamters(
+        true,
+        true,
+        message,
+        "phone_number",
+        new String[] { "number_one", "number_two"});
+
+  }
+
+  protected void initializeWithPhoneNumber(String phoneNumber) {
+
+    this.initializeWithParamters(
+        true,
+        true,
+        "a message",
+        phoneNumber,
+        null);
 
   }
 
