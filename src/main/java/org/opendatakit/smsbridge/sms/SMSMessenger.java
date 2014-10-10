@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.telephony.SmsManager;
 import android.util.Log;
 import org.opendatakit.smsbridge.util.AndroidIntentKeys;
 import org.opendatakit.smsbridge.util.RequestCodes;
@@ -66,6 +67,35 @@ public class SMSMessenger {
     launchingActivity.startActivityForResult(
         intent,
         RequestCodes.SEND_SMS_VIA_INTENT);
+
+  }
+
+  public void sendSMSViaManager() {
+
+    SmsManager defaultManager = SmsManager.getDefault();
+
+    if (this.mTargetNumbers.size() > 1) {
+      Log.e(
+          TAG,
+          "[sendSMSViaManager] sending to multiple numbers is unimplemented");
+    }
+
+    this.sendSingleMessageViaManagerHelper(
+        defaultManager,
+        this.mTargetNumbers.get(0));
+
+  }
+
+  protected void sendSingleMessageViaManagerHelper(
+      SmsManager manager,
+      String phoneNumber) {
+
+    manager.sendTextMessage(
+        phoneNumber,
+        null,
+        this.mMessageBody,
+        null,
+        null);
 
   }
 

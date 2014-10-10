@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.telephony.SmsManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import org.opendatakit.smsbridge.util.AndroidIntentKeys;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowSmsManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,6 +107,45 @@ public class SMSMessengerTest {
         .sendSingleMessageViaIntentHelper(
             this.activity,
             this.targetNumbers.get(0));
+
+  }
+
+  @Test
+  public void sendSMSViaManagerHelperSucceeds() {
+
+    SmsManager defaultManager = SmsManager.getDefault();
+
+    this.messenger.sendSingleMessageViaManagerHelper(
+        defaultManager,
+        this.targetNumbers.get(0));
+
+    ShadowSmsManager shadowSmsManager = Robolectric.shadowOf(defaultManager);
+    ShadowSmsManager.TextSmsParams sentSmsParams =
+        shadowSmsManager.getLastSentTextMessageParams();
+
+    assertThat(sentSmsParams.getText()).isEqualTo(this.messageBody);
+
+    assertThat(sentSmsParams.getScAddress()).isNull();
+
+    assertThat(sentSmsParams.getDestinationAddress())
+        .isEqualTo(this.targetNumbers.get(0));
+
+  }
+
+  @Test
+  public void sendSMSViaManagerCallsHelper() {
+
+    this.messenger = spy(this.messenger);
+
+    doNothing().when(this.messenger).sendSingleMessageViaManagerHelper(
+        SmsManager.getDefault(),
+        this.targetNumbers.get(0));
+
+    this.messenger.sendSMSViaManager();
+
+    verify(this.messenger, times(1)).sendSingleMessageViaManagerHelper(
+        SmsManager.getDefault(),
+        this.targetNumbers.get(0));
 
   }
 
