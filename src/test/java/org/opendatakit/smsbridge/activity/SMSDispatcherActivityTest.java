@@ -2,14 +2,19 @@ package org.opendatakit.smsbridge.activity;
 
 import static org.fest.assertions.api.ANDROID.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import org.fest.assertions.api.android.widget.ToastAssert;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opendatakit.R;
+import org.opendatakit.smsbridge.sms.SMSMessenger;
 import org.opendatakit.smsbridge.util.TestUtil;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
@@ -27,7 +32,7 @@ import java.util.List;
 @RunWith(RobolectricTestRunner.class)
 public class SMSDispatcherActivityTest {
 
-  ActivityController<SMSDispatcherActivity> activityController;
+  ActivityController<SMSDispatcherActivityStub> activityController;
 
   protected void initializeWithParamters(
       boolean requireConfirmation,
@@ -47,9 +52,15 @@ public class SMSDispatcherActivityTest {
     intent.putExtras(bundle);
 
     this.activityController =
-        Robolectric.buildActivity(SMSDispatcherActivity.class)
+        Robolectric.buildActivity(SMSDispatcherActivityStub.class)
             .withIntent(intent);
 
+  }
+
+  @After
+  public void after() {
+    SMSDispatcherActivityStub.resetState();
+    this.activityController = null;
   }
 
   @Test
@@ -151,10 +162,11 @@ public class SMSDispatcherActivityTest {
 
     SMSDispatcherActivity activity = this.activityController
         .create()
-        .start()
         .get();
 
-    assertThat(activity).isFinishing();
+    boolean isValid = activity.assertValidState();
+
+    assertThat(isValid).isFalse();
 
     assertThat(ShadowToast.getTextOfLatestToast()).isEqualTo(
         Robolectric.application.getString(R.string.no_message_body));
@@ -162,19 +174,90 @@ public class SMSDispatcherActivityTest {
   }
 
   @Test
-  public void assertValidStateFinishesAndToastsIfNoPhoneNumberSpecified() {
+  public void assertValidStateTrueIfValid() {
+
+    this.initializeWithValidParameters();
+
+    SMSDispatcherActivity activity = this.activityController
+        .create()
+        .get();
+
+    boolean isValid = activity.assertValidState();
+
+    assertThat(isValid).isTrue();
+
+  }
+
+  @Test
+  public void assertValidStateReturnsFalseAndToastsIfNoPhoneNumberSpecified() {
 
     this.initializeWithPhoneNumber(null);
 
-    SMSDispatcherActivity activity = this.activityController
+    SMSDispatcherActivityStub activity = this.activityController
+        .create()
+        .get();
+
+    boolean isValid = activity.assertValidState();
+
+    assertThat(isValid).isFalse();
+
+    assertThat(ShadowToast.getTextOfLatestToast()).isEqualTo(
+        Robolectric.application.getString(R.string.no_phone_number));
+
+  }
+
+  @Test
+  public void onStartSendsViaIntentAndFinishes() {
+
+    this.initializeWithParamters(
+        true,  // we want to send via intent
+        true,
+        "message body"
+        ,"3605551234",
+        null);
+
+    SMSMessenger messengerMock = mock(SMSMessenger.class);
+
+    SMSDispatcherActivityStub.SMS_MESSENGER = messengerMock;
+
+    SMSDispatcherActivityStub activity = this.activityController
         .create()
         .start()
         .get();
 
     assertThat(activity).isFinishing();
 
-    assertThat(ShadowToast.getTextOfLatestToast()).isEqualTo(
-        Robolectric.application.getString(R.string.no_phone_number));
+    verify(messengerMock, times(1)).sendSMSViaIntent(activity);
+
+  }
+
+  @Test
+  public void onStartSendsViaManagerAndFinishes() {
+
+    SMSMessenger messengerMock = mock(SMSMessenger.class);
+
+    SMSDispatcherActivityStub.SMS_MESSENGER = messengerMock;
+
+    this.initializeWithParamters(
+        false,  // we want to go straight to the manager
+        true,
+        "message body"
+        ,"3605551234",
+        null);
+
+    SMSDispatcherActivityStub activity = this.activityController
+        .create()
+        .start()
+        .get();
+
+    assertThat(activity).isFinishing();
+
+    verify(messengerMock, times(1)).sendSMSViaManager();
+
+  }
+
+  @Test
+  public void deletesMessage() {
 
   }
 

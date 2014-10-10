@@ -3,6 +3,7 @@ package org.opendatakit.smsbridge.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import org.opendatakit.R;
+import org.opendatakit.smsbridge.sms.SMSMessenger;
 import org.opendatakit.smsbridge.util.BundleUtil;
 import org.opendatakit.smsbridge.util.ToastUtil;
 
@@ -42,7 +43,23 @@ public class SMSDispatcherActivity extends Activity {
     // i.e. we can still get at the activity after calls to onCreate(). This is
     // ok, since it is still not visible to the user by this point.
 
-    this.assertValidState();
+    if (assertValidState()) {
+
+      SMSMessenger messenger = this.createSMSMessenger();
+
+      if (this.mRequireConfirmation) {
+        messenger.sendSMSViaIntent(this);
+      } else {
+        messenger.sendSMSViaManager();
+      }
+
+
+    }
+
+
+    // TODO: look into deleting the message. Might be impossible on kitkat.
+
+    this.finish();
 
   }
 
@@ -83,19 +100,22 @@ public class SMSDispatcherActivity extends Activity {
   }
 
   /**
-   * Asserts that the activity's state is valid. If not,
+   * Asserts that the activity's state is valid. Launches appropriate toast if
+   * not. Returns true if valid, false if invalid.
    */
-  protected void assertValidState() {
+  protected boolean assertValidState() {
 
     if (this.noMessageBodySpecified()) {
       ToastUtil.toastShort(this, R.string.no_message_body);
-      this.finish();
+      return false;
     }
 
     if (this.noPhoneNumbersSpecified()) {
       ToastUtil.toastShort(this, R.string.no_phone_number);
-      this.finish();
+      return false;
     }
+
+    return true;
 
   }
 
@@ -109,6 +129,16 @@ public class SMSDispatcherActivity extends Activity {
 
   protected boolean noPhoneNumbersSpecified() {
     return this.mTargetNumbers.isEmpty();
+  }
+
+  protected SMSMessenger createSMSMessenger() {
+
+    SMSMessenger result = new SMSMessenger(
+        this.mMessageBody,
+        this.mTargetNumbers);
+
+    return result;
+
   }
 
 
