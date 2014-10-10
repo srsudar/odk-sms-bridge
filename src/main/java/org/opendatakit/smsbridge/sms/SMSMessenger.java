@@ -27,6 +27,11 @@ public class SMSMessenger {
   protected String mMessageBody;
   protected List<String> mTargetNumbers;
 
+  /**
+   *
+   * @param messageBody the body of the message
+   * @param targetNumbers the list of numbers to send the message to
+   */
   public SMSMessenger(String messageBody, List<String> targetNumbers) {
     this.mMessageBody = messageBody;
     this.mTargetNumbers = targetNumbers;
