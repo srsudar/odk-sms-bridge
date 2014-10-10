@@ -111,4 +111,29 @@ public class BundleUtilTest {
 
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void getRequireConfirmationThrowsIfAbsent() {
+    BundleUtil.getRequireConfirmationFromBundle(this.bundle, true);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getDeleteAfterSendingThrowsIfAbsent() {
+    BundleUtil.getDeleteAfterSendingFromBundle(this.bundle, true);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getMessageBodyThrowsIfAbsent() {
+    BundleUtil.getMessageBodyFromBundle(this.bundle, true);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getPhoneNumberThrowsIfAbsent() {
+    BundleUtil.getPhoneNumberFromBundle(this.bundle, true);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getPhoneNumbersThrowsIfAbsent() {
+    BundleUtil.getPhoneNumbersFromBundle(this.bundle, true);
+  }
+
 }
