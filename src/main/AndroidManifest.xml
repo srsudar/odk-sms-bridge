@@ -19,5 +19,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".smsbridge.activity.SMSDispatcherActivity">
+
+        </activity>
+
     </application>
 </manifest>
