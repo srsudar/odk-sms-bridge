@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import org.fest.assertions.api.android.widget.ToastAssert;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -56,7 +56,6 @@ public class SMSDispatcherActivity extends Activity {
 
     }
 
-
     // TODO: look into deleting the message. Might be impossible on kitkat.
 
     this.finish();
