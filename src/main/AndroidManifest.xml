@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.SEND_SMS"/>
 
     <application
-            android:label="@string/app_title">
+            android:label="@string/app_title"
+            android:icon="@drawable/ic_launcher">
 
         <activity android:name=".activity.WelcomeActivity" android:screenOrientation="portrait">
             <intent-filter>
