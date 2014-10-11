@@ -12,7 +12,7 @@ import android.os.Bundle;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opendatakit.R;
+import org.opendatakit.smsbridge.R;
 import org.opendatakit.smsbridge.sms.SMSMessenger;
 import org.opendatakit.smsbridge.util.TestUtil;
 import org.robolectric.Robolectric;

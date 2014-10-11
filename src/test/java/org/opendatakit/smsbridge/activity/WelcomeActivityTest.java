@@ -7,11 +7,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.Bundle;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opendatakit.smsbridge.sms.SMSMessenger;
+import org.opendatakit.smsbridge.util.BundleUtil;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -39,38 +43,6 @@ public class WelcomeActivityTest {
   @Test
   public void createsSuccessfullly() throws Exception {
       assertThat(this.activity).isNotNull();
-  }
-
-  @Test
-  public void withoutConfirmationCallsCorrectly() {
-
-    SMSMessenger messengerMock = mock(SMSMessenger.class);
-
-    WelcomeActivityStub.SMS_MESSENGER = messengerMock;
-
-    String phoneNumber = "3605551234";
-    String messageBody = "This is a fancy message body.";
-
-    this.activity.mEnterPhoneNumber.setText(phoneNumber);
-    this.activity.mEnterMessageBody.setText(messageBody);
-
-    this.activity.mSendWithoutConfirmation.performClick();
-
-    verify(messengerMock, times(1)).sendSMSViaManager();
-
-  }
-
-  @Test
-  public void withConfirmationCallsCorrectly() {
-
-    SMSMessenger messengerMock = mock(SMSMessenger.class);
-
-    WelcomeActivityStub.SMS_MESSENGER = messengerMock;
-
-    this.activity.mSendWithConfirmation.performClick();
-
-    verify(messengerMock, times(1)).sendSMSViaIntent(this.activity);
-
   }
 
   @Test
@@ -121,25 +93,208 @@ public class WelcomeActivityTest {
   }
 
   @Test
-  public void smsMessengerCreatedSuccessfully() {
+  public void withConfirmationLaunchesCorrectIntent() {
 
-    // We want to use the real super implementation.
-    WelcomeActivityStub.USE_INJECTED = false;
+    ComponentName targetComponent = new ComponentName(
+        "org.opendatakit.smsbridge",
+        "org.opendatakit.smsbridge.activity.SMSDispatcherActivity");
 
-    String phoneNumber = "3605554444";
-    String messageBody = "My fancy test message body";
+    String messageBody = "fancy message body";
+    String phoneNumber = "3605557777";
 
-    List<String> targetNumbers = new ArrayList<String>();
-    targetNumbers.add(phoneNumber);
+    Bundle target = this.getBundleForParams(
+        true,
+        false,
+        messageBody,
+        phoneNumber,
+        null);
 
+    this.activity.mEnterMessageBody.setText(messageBody);
     this.activity.mEnterPhoneNumber.setText(phoneNumber);
+
+    this.activity.mSendWithConfirmation.performClick();
+
+    Intent launched = Robolectric.shadowOf(this.activity)
+        .peekNextStartedActivity();
+
+    assertThat(launched)
+        .isNotNull()
+        .hasComponent(targetComponent);
+
+    assertThat(launched.getExtras()).isEqualTo(target);
+
+  }
+
+  @Test
+  public void getBundleCorrectWithSingleNumber() {
+
+    String phoneNumber = "3605558888";
+    this.activity.mEnterPhoneNumber.setText(phoneNumber);
+
+    String messageBody = "hello hello";
     this.activity.mEnterMessageBody.setText(messageBody);
 
-    SMSMessenger retrieved = this.activity.createSMSMessenger();
+    boolean requireConfirmation = true;
 
-    SMSMessenger target = new SMSMessenger(messageBody, targetNumbers);
+    Bundle target = this.getBundleForParams(
+        requireConfirmation,
+        false,  // always false for now
+        messageBody,
+        phoneNumber,
+        null);
 
-    assertThat(retrieved).isEqualTo(target);
+    Bundle actual = this.activity.getBundleFromFields(
+        requireConfirmation,
+        false);
+
+    this.helperBundleAssert(actual, target);
+
+  }
+
+  @Test
+  public void getBundleCorrectWithNumberArray() {
+
+    String phoneNumbers = "3605559999, 2065551234";
+    this.activity.mEnterPhoneNumber.setText(phoneNumbers);
+
+    String messageBody = "tea or skyrim";
+    this.activity.mEnterMessageBody.setText(messageBody);
+
+    boolean requireConfirmation = false;
+
+    Bundle target = this.getBundleForParams(
+        requireConfirmation,
+        false,
+        messageBody,
+        null,
+        new String[] { "3605559999", "2065551234" });
+
+    Bundle actual = this.activity.getBundleFromFields(
+        requireConfirmation,
+        false);
+
+    this.helperBundleAssert(actual, target);
+
+  }
+
+  @Test
+  public void getBundleCorrectWithNoText() {
+
+    String phoneNumber = "";
+    this.activity.mEnterPhoneNumber.setText(phoneNumber);
+
+    String messageBody = "hello hello";
+    this.activity.mEnterMessageBody.setText(messageBody);
+
+    boolean requireConfirmation = true;
+
+    Bundle target = this.getBundleForParams(
+        requireConfirmation,
+        false,  // always false for now
+        messageBody,
+        phoneNumber,
+        null);
+
+    Bundle actual = this.activity.getBundleFromFields(
+        requireConfirmation,
+        false);
+
+    assertThat(actual).isEqualTo(target);
+
+  }
+
+  @Test
+  public void withoutConfirmationLaunchesCorrectIntent() {
+
+    ComponentName targetComponent = new ComponentName(
+        "org.opendatakit.smsbridge",
+        "org.opendatakit.smsbridge.activity.SMSDispatcherActivity");
+
+    String messageBody = "fancy message body";
+    String phoneNumber = "3605557777";
+
+    Bundle target = this.getBundleForParams(
+        false,
+        false,
+        messageBody,
+        phoneNumber,
+        null);
+
+    this.activity.mEnterMessageBody.setText(messageBody);
+    this.activity.mEnterPhoneNumber.setText(phoneNumber);
+
+    this.activity.mSendWithoutConfirmation.performClick();
+
+    Intent launched = Robolectric.shadowOf(this.activity)
+        .peekNextStartedActivity();
+
+    assertThat(launched)
+        .isNotNull()
+        .hasComponent(targetComponent);
+
+    Bundle actualBundle = launched.getExtras();
+
+    this.helperBundleAssert(actualBundle, target);
+
+  }
+
+  /**
+   * Assert that our Bundle is the same. Normal fest assertion fails due to the
+   * array.
+   * @param actual
+   * @param target
+   */
+  protected void helperBundleAssert(Bundle actual, Bundle target) {
+
+    // Annoyingly, this doesn't seem to do Array.equals correctly.
+
+    boolean requireConfirmation =
+        BundleUtil.getRequireConfirmationFromBundle(actual, true);
+    String messageBody = BundleUtil.getMessageBodyFromBundle(actual, true);
+    String phoneNumber = BundleUtil.getPhoneNumberFromBundle(actual, true);
+    String[] numbers = BundleUtil.getPhoneNumbersFromBundle(actual, true);
+
+    assertThat(BundleUtil.getRequireConfirmationFromBundle(target, true))
+        .isEqualTo(requireConfirmation);
+
+    assertThat(BundleUtil.getDeleteAfterSendingFromBundle(target, true))
+        .isFalse();
+
+    assertThat(BundleUtil.getMessageBodyFromBundle(target, true))
+        .isEqualTo(messageBody);
+
+    assertThat(BundleUtil.getPhoneNumberFromBundle(target, true))
+        .isEqualTo(phoneNumber);
+
+    assertThat(BundleUtil.getPhoneNumbersFromBundle(target, true))
+        .isEqualTo(numbers);
+  }
+
+  /**
+   * Helper to construct a Bundle.
+   * @param requireConfirmation
+   * @param deleteMessage
+   * @param messageBody
+   * @param phoneNumber
+   * @param phoneNumbers
+   * @return
+   */
+  protected Bundle getBundleForParams(
+      boolean requireConfirmation,
+      boolean deleteMessage,
+      String messageBody,
+      String phoneNumber,
+      String[] phoneNumbers) {
+
+    Bundle result = new Bundle();
+
+    BundleUtil.putRequireConfirmationInBundle(result, requireConfirmation);
+    BundleUtil.putDeleteAfterSendingInBundle(result, deleteMessage);
+    BundleUtil.putMessageBodyInBundle(result, messageBody);
+    BundleUtil.putPhoneNumberInBundle(result, phoneNumber);
+    BundleUtil.putPhoneNumberArrayInBundle(result, phoneNumbers);
+
+    return result;
 
   }
 

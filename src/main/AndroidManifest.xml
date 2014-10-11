@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           android:versionCode="2"
           android:versionName="1.0.0-SNAPSHOT"
-          package="org.opendatakit">
+          package="org.opendatakit.smsbridge">
 
     <uses-sdk android:minSdkVersion="18"
               android:targetSdkVersion="18"/>
@@ -12,7 +12,7 @@
     <application
             android:label="@string/app_title">
 
-        <activity android:name=".smsbridge.activity.WelcomeActivity" android:screenOrientation="portrait">
+        <activity android:name=".activity.WelcomeActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -20,7 +20,7 @@
         </activity>
 
         <activity
-                android:name=".smsbridge.activity.SMSDispatcherActivity"
+                android:name=".activity.SMSDispatcherActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="org.opendatakit.smsbridge.activity.SMSDispatcherActivity"/>
