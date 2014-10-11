@@ -1,7 +1,8 @@
 # ODK SMS Bridge
+
 [![Build Status](https://travis-ci.org/srsudar/odk-sms-bridge.svg?branch=master)](https://travis-ci.org/srsudar/odk-sms-bridge)
 
-> An app for sending SMS messages with and without user confirmation.
+An app for sending SMS messages with and without user confirmation.
 
 ## Overview
 
