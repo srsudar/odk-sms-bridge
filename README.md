@@ -83,7 +83,8 @@ In this example we'll define a new prompt type called `send_sms` and use it in
 a form.
 
 > The files are explained below. You can also find the files themselves in
-the `surveyFiles/` directory.
+the [surveyFiles directory](
+https://github.com/srsudar/odk-sms-bridge/tree/master/surveyFiles).
 
 First, let's set up our form. It will consist of three prompts: a name, a phone
 number, and the button that sends an SMS.
