@@ -82,6 +82,9 @@ is `my_table`, the full path of this file would be
 In this example we'll define a new prompt type called `send_sms` and use it in
 a form.
 
+> The files are explained below. You can also find the files themselves in
+the `surveyFiles/` directory.
+
 First, let's set up our form. It will consist of three prompts: a name, a phone
 number, and the button that sends an SMS.
 
@@ -180,11 +183,13 @@ confirmation and send a message saying hello to the entered phone number.
 
 ## Architecture
 
-SMS messages are sent by the [SMSDispatcherActivity](#). This activity has no
+SMS messages are sent by the [SMSDispatcherActivity](
+https://github.com/srsudar/odk-sms-bridge/blob/master/src/main/java/org/opendatakit/smsbridge/activity/SMSDispatcherActivity.java). This activity has no
 user interface. It interprets arguments passed via an Intent (see Usage) and
 finishes immediately. This is the Activity callers should invoke.
 
-The main screen of the app is the [WelcomeActivity](#). It exists to allow
+The main screen of the app is the [WelcomeActivity](
+https://github.com/srsudar/odk-sms-bridge/blob/master/src/main/java/org/opendatakit/smsbridge/activity/WelcomeActivity.java). It exists to allow
 users to see what interactions with the `SMSDispatcherActivity` are like. Two
 buttons let you send a message with or without user confirmation to give you a
 sense of the different user experiences.
