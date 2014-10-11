@@ -13,7 +13,9 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opendatakit.smsbridge.R;
+import org.opendatakit.smsbridge.contract.IntentKeys;
 import org.opendatakit.smsbridge.sms.SMSMessenger;
+import org.opendatakit.smsbridge.util.BundleUtil;
 import org.opendatakit.smsbridge.util.TestUtil;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
@@ -206,13 +208,43 @@ public class SMSDispatcherActivityTest {
   }
 
   @Test
+  public void assertValidStateWithMinimumInformation() {
+
+    // all we really need is the phone number, body, and user intervention.
+    String phoneNumber = "2065557654";
+    String messageBody = "This is a minimal message.";
+    boolean requireIntervention = true;
+
+    Intent intent = new Intent();
+
+    Bundle extras = new Bundle();
+    extras.putString(IntentKeys.PHONE_NUMBER, phoneNumber);
+    extras.putString(IntentKeys.MESSAGE_BODY, messageBody);
+    extras.putBoolean(IntentKeys.REQUIRE_CONFIRMATION, requireIntervention);
+
+    intent.putExtras(extras);
+
+    this.activityController =
+        Robolectric.buildActivity(SMSDispatcherActivityStub.class)
+            .withIntent(intent);
+
+    SMSDispatcherActivityStub activity =
+        this.activityController.create().get();
+
+    boolean isValid = activity.assertValidState();
+
+    assertThat(isValid).isTrue();
+
+  }
+
+  @Test
   public void onStartSendsViaIntentAndFinishes() {
 
     this.initializeWithParamters(
         true,  // we want to send via intent
         true,
-        "message body"
-        ,"3605551234",
+        "message body",
+        "3605551234",
         null);
 
     SMSMessenger messengerMock = mock(SMSMessenger.class);

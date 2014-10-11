@@ -74,7 +74,7 @@ public class SMSDispatcherActivity extends Activity {
 
     this.mDeleteAfterSending = BundleUtil.getDeleteAfterSendingFromBundle(
         bundle,
-        true);
+        false);
 
     this.mMessageBody = BundleUtil.getMessageBodyFromBundle(
         bundle,

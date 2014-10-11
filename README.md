@@ -44,7 +44,24 @@ The code below sends a message to number `3605551234` with the content `This is
 a fancy message.`.
 
 ```java
+Intent intent = new Intent();
 
+ComponentName componentName = new ComponentName(
+    "org.opendatakit.smsbridge",
+    "org.opendatakit.smsbridge.activity.SMSDispatcherActivity");
+
+intent.setComponent(componentName);
+
+Bundle bundle = new Bundle();
+
+// False to send an SMS immediately without the user stepping in.
+// True to require user intervention.
+bundle.putBoolean("require_confirmation", false);
+
+bundle.putString("message_body", "This is a fancy message.");
+bundle.putString("phone_number", "3605551234");
+
+context.startActivity(intent);
 ```
 
 
