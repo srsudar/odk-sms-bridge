@@ -2,7 +2,7 @@ package org.opendatakit.smsbridge.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import org.opendatakit.R;
+import org.opendatakit.smsbridge.R;
 import org.opendatakit.smsbridge.sms.SMSMessenger;
 import org.opendatakit.smsbridge.util.BundleUtil;
 import org.opendatakit.smsbridge.util.ToastUtil;
