@@ -21,6 +21,9 @@ This app is a small wrapper around both methods that lets you use either
 technique via an Intent. A `require_confirmation` boolean variable selects
 which method is used.
 
+While not currently on the Play Store, you can download the latest snapshot
+build [here](http://samsudar.com/projects/apks/odk-sms-bridge-1.0.0.apk).
+
 ## Usage
 
 The ODK SMS Bridge is designed to be called from other apps via Intents.
