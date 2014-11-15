@@ -24,6 +24,10 @@ which method is used.
 While not currently on the Play Store, you can download the latest snapshot
 build [here](http://samsudar.com/projects/apks/odk-sms-bridge-1.0.0.apk).
 
+For more information on the Open Data Kit (ODK) project, please see the project
+[homepage](http://opendatakit.org/) or
+[developer page](https://code.google.com/p/opendatakit/).
+
 ## Usage
 
 The ODK SMS Bridge is designed to be called from other apps via Intents.
